@@ -1,17 +1,54 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
+import {render,unmountComponentAtNode} from 'react-dom';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+class ReactElement extends HTMLElement {
+  
+    constructor() {
+      super();
+    }
+  
+    static get observedAttributes() {
+      return ['selectedvalue','toggle'];
+    }
+    connectedCallback() {
+      this._innerHTML = this.innerHTML;
+      this.mount();
+    }
+  
+    disconnectedCallback() {
+      this.unmount();
+    }
+  
+    update() {
+      this.unmount();
+      this.mount();
+    }
+    attributeChangedCallback(name, oldValue, newValue) {
+      switch (name) {
+        case 'selectedvalue':
+          console.log(`Value changed from ${oldValue} to ${newValue}`);
+          this.mount()
+          break;
+        case 'toggle':
+        console.log(`Value changed from ${oldValue} to ${newValue}`);
+        this.mount()
+        break;  
+      }
+    }
+    mount() {
+      const props ={ 
+        selectedvalue: this.getAttribute("selectedvalue"),
+        toggleval: this.getAttribute("toggle")
+    }
+      render(<App  {...props}/>, this);
+      
+    }
+  
+    unmount() {
+      unmountComponentAtNode(this);
+    }
+  
+  }
+  
+  customElements.define('react-app', ReactElement);
